@@ -45,6 +45,8 @@ Another fine-tuning approach we will explore is QLoRA \cite{qlora}. This deviate
 
 We will also explore fine-tuning using DoRA \cite{dora}, which is a LoRa \cite{lora} variant like QLoRA. Its authors claim that it is a better approach to fine-tuning than LoRa, while still maintaining the computational advantage of LoRA.
 
+In addition to this, we thought of exploring fine-tuning with ProMot \cite{valizadehaslani2022twostagefinetuningnovelstrategy}, as it offers a promising approach for our MLLM. ProMoT's flexibility in handling various output formats and task types is particularly relevant to our work with the ScienceQA dataset, as it may allow the MLLM to effectively manage the diverse question types encountered in multimodal multiple-choice question answering
+
 If we have time, we will compare with a training approach using retrieval-augmented generation (RAG). RAGs can help improve the capabilities of LLMs on specific domains by referencing knowledge outside of the training sources of the LLM.
 
 \section*{Literature review} 
