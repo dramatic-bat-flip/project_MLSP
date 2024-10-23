@@ -33,7 +33,7 @@
 \maketitle
 
 \section*{Abstract}
-The project aims to compare different approches to fine-tune a multimodal large language models (MLLM) for multimodal multiple-choice question answering on the ScienceQA dataset \cite{ScienceQA}.  More recent fine-tuning approaches will be explored and compared to traditional fine-tuning. We will use accuracy to compare model performance.
+The project aims to compare different approches to fine-tune a multimodal large language models (MLLM) for multimodal multiple-choice question answering on the ScienceQA dataset \cite{ScienceQA}. More recent fine-tuning approaches will be explored and compared to traditional fine-tuning. We will use accuracy to compare model performance.
 
 \section*{Introduction}
 We will compare different ways to fine-tune an MLMM for multimodal multiple-choice question answering. In this type of task, a multiple-choice question is asked which references a given image. We will use the ScienceQA dataset as a benchmark. This dataset contains primary and high-school questions related to science and is easily available on HuggingFace.
@@ -42,12 +42,15 @@ The first fine-tuning method will consist of a two-step fine-tuning method. Sinc
 
 Another fine-tuning approach we will explore is QLoRA. This deviates from regular fine-tuning by representing the weight update matrix ($\Delta W$) as a low-rank decomposition of the weight matrix. This approach requires much less computational resources.
 
-If we have time, we will compare with a training approach using retrieval-augmented generation (RAG). RAGs can help improve the capabilities of LLMs to specific domains by referencing knowledge outside of the training sources of the LLM.
-
+If we have time, we will compare with a training approach using retrieval-augmented generation (RAG). RAGs can help improve the capabilities of LLMs on specific domains by referencing knowledge outside of the training sources of the LLM.
 
 \section*{Literature review} 
 
+Many of the models fine-tuned on the ScienceQA dataset in Huggingface do not have multimodal capabilities. They ignore the images and still can obtain good performance since, for most questions, the added context is sufficient to answer the question. We want to fine-tune an MLMM to answer the question without using the added context.
+
 LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a seperate set of weights which are then added to the orginal weights. In regular fine-tuning an entire wieght update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA seperates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. \cite{qlora} observed performance levels similar to those of LoRA.
+
+An extensive review of RAG \cite{ragreview} has found that RAGs can help address hallucination and outdated knowledge problems. The advantage of RAG is that they allow for continuous knowlede update to the model and can allow an LLM to incorporate knowledge outside of the training domain. RAG are not always better than fine-tuning, especially for tasks which require specific data formats as inputs and a response in a particular style.
 
 \section*{Input-Output Dataset}
 
@@ -61,7 +64,7 @@ There are 2 steps to this process :
     \item Obtain response from the LLM. The response will be the index of the chosen answer from the list of choices (in the example the answer would be solution A).
 \end{enumerate}
 
-We will use a pretrained LLM as the base model. We must use a multimodal LLM as some queries can contain images. 
+We will use a pretrained LLM as the base model. We must use a multimodal LLM as some queries can contain images. We will limit ourselves to LLMs with no more than 8 billion parameters in order to keep training times reasonable. Suitable MLLMs could be Qwen2VL \cite{Qwen2VL}, LLaVA \cite{liu2023llava}, or InternVL \cite{chen2023internvl}. 
 
 \section*{Performance Metrics}
 We will evaluate performance using accuracy. It is a widely used and suitable metric for multiple-choice question answering since it is simple and easily interpretable.
