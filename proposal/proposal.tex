@@ -42,6 +42,8 @@ The first fine-tuning method will consist of a two-step fine-tuning method. Sinc
 
 Another fine-tuning approach we will explore is QLoRA. This deviates from regular fine-tuning by representing the weight update matrix ($\Delta W$) as a low-rank decomposition of the weight matrix. This approach requires much less computational resources.
 
+We will also explore fine-tuning using DoRa \cite{dora}, which is a LoRa variant like QLoRA. Its authors claim that it is a better approach to fine-tuning than LoRa, while still maintaining the computational advantage of LoRa.
+
 If we have time, we will compare with a training approach using retrieval-augmented generation (RAG). RAGs can help improve the capabilities of LLMs on specific domains by referencing knowledge outside of the training sources of the LLM.
 
 \section*{Literature review} 
@@ -49,6 +51,7 @@ If we have time, we will compare with a training approach using retrieval-augmen
 Many of the models fine-tuned on the ScienceQA dataset in Huggingface do not have multimodal capabilities. They ignore the images and still can obtain good performance since, for most questions, the added context is sufficient to answer the question. We want to fine-tune an MLMM to answer the question without using the added context.
 
 LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a seperate set of weights which are then added to the orginal weights. In regular fine-tuning an entire wieght update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA seperates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. \cite{qlora} observed performance levels similar to those of LoRA.
+Another LoRa variant is DoRa \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understading.
 
 An extensive review of RAG \cite{ragreview} has found that RAGs can help address hallucination and outdated knowledge problems. The advantage of RAG is that they allow for continuous knowlede update to the model and can allow an LLM to incorporate knowledge outside of the training domain. RAG are not always better than fine-tuning, especially for tasks which require specific data formats as inputs and a response in a particular style.
 
