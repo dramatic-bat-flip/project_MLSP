@@ -24,7 +24,7 @@
 
 %Titre
 %----------------------------------------------------------------
-\title{IFT-7030 Project proposal}
+\title{\vspace{-2.0cm}IFT-7030 Project proposal}
 \author{Philippe Gélinas 536 782 326 \\ Antoine Reid 536 899 522 \\ Sara Boukili 537 178 413}
 \date{\vspace{-5ex}} % Don't show date and remove spacing
 
@@ -54,10 +54,10 @@ LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \ci
 Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understanding. DoRA decomposes the weights of a pre-trained model into magnitude and direction components. For more details about DoRA, see appendix \ref{appendix:dora}.
 
 ProMoT (Prompt Tuning with Model Tuning) \cite{valizadehaslani2022twostagefinetuningnovelstrategy} addresses the challenge of language models becoming overly specialized during fine-tuning, which can reduce their general capabilities. It uses a two-stage approach that offloads format learning to additional parameters through prompt tuning, allowing for comparable performance on the fine-tuned task while preserving or even enhancing general in-context learning abilities. This flexibility in managing various output formats and task types is particularly beneficial for the diverse question types in the ScienceQA dataset.
-\section*{Input-Output Dataset}
 
 An extensive review of RAG \cite{ragreview} has found that RAGs can help address hallucination and outdated knowledge problems. The advantage of RAG is that they allow for continuous knowledge update to the model and can allow an LLM to incorporate knowledge outside of the training domain. RAG are not always better than fine-tuning, especially for tasks which require specific data formats as inputs and a response in a particular style.
 
+\section*{Input-Output Dataset}
 As mentioned, we will use the ScienceQA dataset. The ScienceQA dataset contains 21\,208 multimodal multiple-choice questions collected from primary and high school curricula. The questions are separated into 3 subjects: natural science, language science, and social science. Roughly 49\,\% of the questions have an image context, 48\,\% have a text context, and 31\,\% have both. An interesting aspect of the ScienceQA dataset is that most question contain lectures (84\,\%) and detailed explanations (91\,\%) that help answer the question. The dataset has already been split into train, test, and validation sets on HuggingFace. The train set contains 12\,726 observations, whereas the test and validation sets each contains 4\,241 observations. We will use the train and tests sets to fine-tune the model and the test set to evaluate performance. The following diagram illustrates what the input (query) can look like and how it will be processed: 
 
 \begin{figure}[H]
