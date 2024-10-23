@@ -10,13 +10,14 @@
 \usepackage{csquotes}
 \usepackage[sorting=none]{biblatex} % Bibliography
 \addbibresource{ref.bib}
-
+\usepackage[toc,page]{appendix} % Appendix
 
 
 %Autres packages et commandes utiles
 %----------------------------------------------------------------
 \usepackage{enumerate} % Pour mieux gérer la commande enumerate dans les sections
 \usepackage{graphicx}	% Pour inclure des images
+\usepackage{float}
 \graphicspath{ {./images/} } % set path to images
 \usepackage{hyperref} % to allow hyperlinks
 \usepackage{typed-checklist} % for checklist
@@ -38,20 +39,18 @@ The project aims to compare different approches to fine-tune a multimodal large 
 \section*{Introduction}
 We will compare different ways to fine-tune an MLMM for multimodal multiple-choice question answering. In this type of task, a multiple-choice question is asked which references a given image. We will use the ScienceQA dataset as a benchmark. This dataset contains primary and high-school questions related to science and is easily available on HuggingFace.
 
-The first fine-tuning method will consist of a two-step fine-tuning method. Since the ScienceQA dataset contains a relatively small amount of data for NLP tasks (21k observations), we will first try to improve the reasoning abilities of the MLMM by performing supervised fine-tuning. We will use a larger dataset for this such as SearchQA (a collection of 140k Jepoardy! questions), HotpotQA (113k reasoning questions from Wikipedia articles), or Orca-Math (a dataset containing roughly 200k grade school math problems). After this first round of fine-tuning, the MLLM will then be fine-tuned to specialize in multiple-choice question answering with the ScienceQA dataset using regular fine-tuning. Regular fine-tuning consists of freezing all but the last layer and updating weights.
+The first fine-tuning method will consist of a two-step fine-tuning method. Since the ScienceQA dataset contains a relatively small amount of data for NLP tasks (21k observations), we will first try to improve the reasoning abilities of the MLMM by performing supervised fine-tuning. We will use a larger dataset for this such as SearchQA (a collection of 140k Jepoardy! questions), HotpotQA (113k reasoning questions from Wikipedia articles), or Orca-Math (a dataset containing roughly 200k grade school math problems). After this first round of fine-tuning, the MLLM will then be fine-tuned to specialize in multiple-choice question answering with the ScienceQA dataset using regular fine-tuning. Regular fine-tuning consists of freezing all but the attention layer and updating weights.
 
-Another fine-tuning approach we will explore is QLoRA. This deviates from regular fine-tuning by representing the weight update matrix ($\Delta W$) as a low-rank decomposition of the weight matrix. This approach requires much less computational resources.
+Another fine-tuning approach we will explore is QLoRA \cite{qlora}. This deviates from traditional fine-tuning by representing the weight update matrix ($\Delta W$) as a low-rank decomposition of the weight matrix. This approach requires much less computational resources than traditional fine-tuning.
 
-We will also explore fine-tuning using DoRa \cite{dora}, which is a LoRa variant like QLoRA. Its authors claim that it is a better approach to fine-tuning than LoRa, while still maintaining the computational advantage of LoRa.
+We will also explore fine-tuning using DoRA \cite{dora}, which is a LoRa \cite{lora} variant like QLoRA. Its authors claim that it is a better approach to fine-tuning than LoRa, while still maintaining the computational advantage of LoRA.
 
 If we have time, we will compare with a training approach using retrieval-augmented generation (RAG). RAGs can help improve the capabilities of LLMs on specific domains by referencing knowledge outside of the training sources of the LLM.
 
 \section*{Literature review} 
 
-Many of the models fine-tuned on the ScienceQA dataset in Huggingface do not have multimodal capabilities. They ignore the images and still can obtain good performance since, for most questions, the added context is sufficient to answer the question. We want to fine-tune an MLMM to answer the question without using the added context.
-
-LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a seperate set of weights which are then added to the orginal weights. In regular fine-tuning an entire wieght update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA seperates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. \cite{qlora} observed performance levels similar to those of LoRA.
-Another LoRa variant is DoRa \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understading.
+LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a seperate set of weights which are then added to the orginal weights. In regular fine-tuning an entire wieght update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA seperates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. The downside of LoRA is that it introduces a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner dimension of the low-rank matrices. QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. \cite{qlora} observed performance levels similar to those of LoRA.
+Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understading. DoRA decomposes the weights of of a pre-trained model into magnitude and direction components. For more details about DoRA, see appendix \ref{appendix:dora}.
 
 An extensive review of RAG \cite{ragreview} has found that RAGs can help address hallucination and outdated knowledge problems. The advantage of RAG is that they allow for continuous knowlede update to the model and can allow an LLM to incorporate knowledge outside of the training domain. RAG are not always better than fine-tuning, especially for tasks which require specific data formats as inputs and a response in a particular style.
 
@@ -85,7 +84,23 @@ Fine-tuning an LLM requires good GPU resources to have reasonable trainig times.
     \Task{done}{Well situated within the literature} Many articles have been published on the topic of fine-tuning LLMs. It is still an active research subject and new fine-tuning methods are constantly being explored.
 \end{CheckList}
 
+% References
 \medskip
 \printbibliography
+
+\newpage
+
+% Appendix
+\begin{appendices}
+    \section{DoRA}\label{appendix:dora}
+    The following figure taken from \cite{dora} explains in greater detail how weights are updated in the DoRA architecture.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.6]{dora_diagram.png}
+    \end{figure}
+    
+
+\end{appendices}
+
 
 \end{document}
