@@ -1,0 +1,147 @@
+% Template for ICASSP-2021 paper; to be used with:
+%          spconf.sty  - ICASSP/ICIP LaTeX style file, and
+%          IEEEbib.bst - IEEE bibliography style file.
+% --------------------------------------------------------------------------
+\documentclass{article}
+\usepackage{spconf,amsmath,graphicx}
+
+% Example definitions.
+% --------------------
+\def\x{{\mathbf x}}
+\def\L{{\cal L}}
+
+% Title.
+% ------
+\title{Fine-tuning MLLM for multimodal question answering}
+%
+% Single address.
+% ---------------
+\name{Sara Boukili \qquad Philippe Gélinas \qquad Antoine Reid}
+%
+% For example:
+% ------------
+\address{Université Laval\\
+	Département d'informatique et de génie logiciel\\
+	IFT-4030 Apprentissage automatique pour le traitement du signal}
+
+\begin{document}
+%\ninept
+%
+\maketitle
+%
+\begin{abstract}
+The abstract should appear at the top of the left-hand column of text, about
+0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
+length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
+beginning of the main text.  The abstract should contain about 100 to 150
+words, and should be identical to the abstract text submitted electronically
+along with the paper cover sheet.  All manuscripts must be in English, printed
+in black ink.
+\end{abstract}
+%
+\begin{keywords}
+One, two, three, four, five
+\end{keywords}
+%
+\section{Introduction}
+\label{sec:intro}
+
+
+\section{Literature review}
+\label{sec:litreview}
+
+LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It
+deviates from regular fine-tuning by freezing the original model weights and by updating a
+separate set of weights which are then added to the original weights. In regular fine-tuning
+an entire weight update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA
+separates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly
+reduces the number of trainable parameters. Along with the reduced computational load this
+brings, it can also help prevent overfitting. The downside of LoRA is that it introduces
+a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner
+dimension of the low-rank matrices. QLoRA \cite{qlora} is a modification of LoRA that introduces
+increased memory efficiency due to storing weight parameters with 4-bit precision. \cite{qlora}
+observed performance levels similar to those of LoRA.
+Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa
+for fine-tuning LLMs for various tasks, including ours, which relates to image-text
+understanding. DoRA decomposes the weights of a pre-trained model into magnitude and direction
+components. DoRA can be applied in the same way as LoRA, and allows its variants like QDoRA.
+
+ProMoT (Prompt Tuning with Model Tuning) \cite{valizadehaslani2022twostagefinetuningnovelstrategy} addresses the challenge of language models becoming overly specialized during fine-tuning, which can reduce their general capabilities. It uses a two-stage approach that offloads format learning to additional parameters through prompt tuning, allowing for comparable performance on the fine-tuned task while preserving or even enhancing general in-context learning abilities. This flexibility in managing various output formats and task types is particularly beneficial for the diverse question types in the ScienceQA dataset.
+
+An extensive review of RAG \cite{ragreview} has found that RAGs can help address hallucination and outdated knowledge problems. The advantage of RAG is that they allow for continuous knowledge update to the model and can allow an LLM to incorporate knowledge outside of the training domain. RAG are not always better than fine-tuning, especially for tasks which require specific data formats as inputs and a response in a particular style.
+
+
+
+\section{Method}
+\label{sec:method}
+
+\subsection{Parameter-Efficient Fine-Tuning}
+For this section, two models are going to be tested: LLaVa\cite{liu2023llava} and Idefics2\cite{idefics2}. These
+two models were chosen because they possess a number of parameters small enough to be suitable for training
+on consumer-grade GPUs, while still offering good capabilities for the task at hand.
+
+LoRA methods present two hyperparameters to play with: the hyperparameter $r$ and the layers which are actually
+fine-tuned. For QLoRA, the fine-tuning of all the layers with $r=4$ and $r=8$ are tested.
+
+\subsection{Prompt tuning}
+
+\section{Experiments}
+\label{sec:experiments}
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+
+
+% Below is an example of how to insert images. Delete the ``\vspace'' line,
+% uncomment the preceding line ``\centerline...'' and replace ``imageX.ps''
+% with a suitable PostScript file name.
+% -------------------------------------------------------------------------
+\begin{figure}[htb]
+
+\begin{minipage}[b]{1.0\linewidth}
+  \centering
+  \centerline{\includegraphics[width=8.5cm]{image1}}
+%  \vspace{2.0cm}
+  \centerline{(a) Result 1}\medskip
+\end{minipage}
+%
+\begin{minipage}[b]{.48\linewidth}
+  \centering
+  \centerline{\includegraphics[width=4.0cm]{image3}}
+%  \vspace{1.5cm}
+  \centerline{(b) Results 3}\medskip
+\end{minipage}
+\hfill
+\begin{minipage}[b]{0.48\linewidth}
+  \centering
+  \centerline{\includegraphics[width=4.0cm]{image4}}
+%  \vspace{1.5cm}
+  \centerline{(c) Result 4}\medskip
+\end{minipage}
+%
+\caption{Example of placing a figure with experimental results.}
+\label{fig:res}
+%
+\end{figure}
+
+
+% To start a new column (but not a new page) and help balance the last-page
+% column length use \vfill\pagebreak.
+% -------------------------------------------------------------------------
+%\vfill
+%\pagebreak
+
+
+\vfill\pagebreak
+
+
+% References should be produced using the bibtex program from suitable
+% BiBTeX files (here: strings, refs, manuals). The IEEEbib.bst bibliography
+% style file from IEEE produces unsorted bibliography list.
+% -------------------------------------------------------------------------
+\bibliographystyle{IEEEbib}
+\bibliography{refs}
+
+\end{document}
