@@ -5,8 +5,8 @@ Idefics2_qlora_r4_ft/
 Idefics2_qlora_last50_ft/
 LLaVA-1.5_dora_ft/
 LLaVA-1.5_qlora_ft/
-full_dora_eval.ipynb
-full_qlora_eval.ipynb
-full_qlora_r4_eval.ipynb
-last50_qlora_eval.ipynb
+Idefics2/full_dora_eval.ipynb
+Idefics2/full_qlora_eval.ipynb
+Idefics2/full_qlora_r4_eval.ipynb
+Idefics2/last50_qlora_eval.ipynb
 llava_full_qlora_eval.ipynb
