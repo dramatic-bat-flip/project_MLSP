@@ -99,6 +99,9 @@ We will fine-tune both models with PEFT methods on a train set of the ScienceQA 
   \label{tab:model_performance}
 \end{table*}
 
+\subsection{Retrieval-augmented generation (RAG)}
+We briefly explored using RAG instead of fine-tuning but quickly ruled out this method. Inference with RAG is very long (it can take minutes to answer a single question) and creating a vector database centered around scientific knowledge would've been too time consuming. Exploring RAG in more detail could be the subject of a future project.
+
 \section{Experiments}
 \label{sec:experiments}
 
