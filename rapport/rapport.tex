@@ -76,7 +76,7 @@ An extensive review of RAG \cite{ragreview} has found that RAGs can help address
 \label{sec:method}
 
 \subsection{Parameter-Efficient Fine-Tuning}
-For this section, two models are going to be tested: LLaVa\cite{liu2023llava} and Idefics2\cite{idefics2}. These
+For this section, two models are going to be tested: LLaVA\cite{liu2023llava} and Idefics2\cite{idefics2}. These
 two models were chosen because they possess a number of parameters small enough to be suitable for training
 on consumer-grade GPUs, while still offering good capabilities for the task at hand.
 
@@ -88,6 +88,26 @@ fine-tuned. For QLoRA, the fine-tuning of all the layers with $r=4$ and $r=8$ ar
 \section{Experiments}
 \label{sec:experiments}
 
+\begin{table}[h]
+\begin{minipage}[b]{2.0\linewidth}
+  \centering
+  \caption{Accuracy of models on test dataset}
+  \begin{tabular}{lrrr}
+    \hline
+    Model & Trainable parameters (millions) & Training time & Accuracy (\%)\\ 
+    \hline
+    Idefics2 QLoRA (r=8) & 23.33 & 6h 18min & 89.14\\ 
+    Idefics2 QLoRA (r=4) & 11.66 & 4h 52min & 88.20\\ 
+    Idefics2 QLoRA last 50 layers (r=8) & 4.73 & 1h & 77.00\\
+    Idefics2 DoRA (r=6) & 19.03 & 10h 13min & 89.54\\
+    LLaVA QLoRA (r=6) & 15.88 & 10h 20min & 83.28\\
+    LLaVA DoRA (r=6) & 17.31 & - & -\\
+    Prompt-tuning & - & 4 days & 79.44\\
+    \hline
+  \end{tabular}
+  \label{tab:model_performance}
+\end{minipage}
+\end{table}
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -102,21 +122,21 @@ fine-tuned. For QLoRA, the fine-tuning of all the layers with $r=4$ and $r=8$ ar
 
 \begin{minipage}[b]{1.0\linewidth}
   \centering
-  \centerline{\includegraphics[width=8.5cm]{image1}}
+  % \centerline{\includegraphics[width=8.5cm]{image1}}
 %  \vspace{2.0cm}
   \centerline{(a) Result 1}\medskip
 \end{minipage}
 %
 \begin{minipage}[b]{.48\linewidth}
   \centering
-  \centerline{\includegraphics[width=4.0cm]{image3}}
+  % \centerline{\includegraphics[width=4.0cm]{image3}}
 %  \vspace{1.5cm}
   \centerline{(b) Results 3}\medskip
 \end{minipage}
 \hfill
 \begin{minipage}[b]{0.48\linewidth}
   \centering
-  \centerline{\includegraphics[width=4.0cm]{image4}}
+  % \centerline{\includegraphics[width=4.0cm]{image4}}
 %  \vspace{1.5cm}
   \centerline{(c) Result 4}\medskip
 \end{minipage}
