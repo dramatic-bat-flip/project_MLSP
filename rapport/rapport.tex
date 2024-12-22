@@ -72,9 +72,9 @@ Traditional fine-tuning is far too costly for consumer hardware because of the s
 
 LoRA significantly reduces the number of trainable parameters by approximating a weight update matrix with two low-rank matrices. LoRA only applies to linear layers of the model. LoRA can reduce the number of trainable parameters by 10,000 times. When using LoRA fine-tuning with a rank of 8 for Idefics2, we reduced the number of trainable parameters from 8.4b to 23.3m. We are training less than 0.1\,\% of the total model parameters! LoRA methods introduce two hyperparameters to set: the rank of the adapter matrices $r$ and the layers which are actually fine-tuned.\par
 
-Despite the important reduction in trainable parameters LoRA offers, it can still be too costly to fine-tune an LLM with 8b parameters on a consumer GPU. This is because the base model, even when frozen, requires too much storage space. To alleviate this problem, we utilize quantization. Generally, the model parameters of an LLM are stored in 16 or 32-bit formats. Quantization compresses these parameters into 4-bit which significantly reduces the memory footprint. Although quantization introduces a loss of information, the impact of the quantization error is minimized by the fine-tuning (during training the model learns and incorporates the quantization error). QLoRA combines quantization and LoRA and is the first PEFT method we will use. It is important to understand that only the frozen parameters are stored in 4-bit, the LoRA adapter layers and the Adam optimizer are not quantized.
+Despite the important reduction in trainable parameters LoRA offers, it can still be too costly to fine-tune an LLM with 8b parameters on a consumer GPU. This is because the base model, even when frozen, requires too much storage space. To alleviate this problem, we utilize quantization. Generally, the model parameters of an LLM are stored in 16 or 32-bit formats. Quantization compresses these parameters into 4-bit which significantly reduces the memory footprint. Although quantization introduces a loss of information, the impact of the quantization error is minimized by the fine-tuning (during training the model learns and incorporates the quantization error). QLoRA combines quantization and LoRA and is the first PEFT method we will use. It is important to understand that only the frozen parameters are stored in 4-bit, the LoRA adapter layers and the Adam optimizer are not quantized.\par
 
-LoRA was found to have much a much different learning behavior than full fine-tuning. Furthermore, LoRA performs worse than full fine-tuning in certain situations. DoRA corrects these shortcomings by decomposing the pretrained weights into their magnitude and direction. LoRA is then applied to the directional component, while the magnitude component is trained as is. The second PEFT method we utilize is a quantized version of DoRA.
+LoRA was found to have much a much different learning behavior than full fine-tuning. Furthermore, LoRA performs worse than full fine-tuning in certain situations. DoRA corrects these shortcomings by decomposing the pretrained weights into their magnitude and direction. LoRA is then applied to the directional component, while the magnitude component is trained as is. DoRA has a greater memory overhead than LoRA since there are more trainable parameters. The second PEFT method we utilize is a quantized version of DoRA.\par
 
 We will fine-tune both models with PEFT methods on a train set of the ScienceQA dataset and then evaluate the performance of the model on the test set. Given that there are a varying number of choices (between 2 and 5), we use accuracy as a performance metric.
 
@@ -100,13 +100,10 @@ We will fine-tune both models with PEFT methods on a train set of the ScienceQA 
 \end{table*}
 
 \subsection{Retrieval-augmented generation (RAG)}
-We briefly explored using RAG instead of fine-tuning but quickly ruled out this method. Inference with RAG is very long (it can take minutes to answer a single question) and creating a vector database centered around scientific knowledge would've been too time consuming. Exploring RAG in more detail could be the subject of a future project.
+We briefly explored using RAG instead of fine-tuning but quickly ruled out this method. Inference with RAG is very long (it can take minutes to answer a single question) and creating a vector database centered around relevant scientific knowledge would've been too time consuming. Exploring RAG in more detail could be the subject of a future project.
 
 \section{Experiments}
 \label{sec:experiments}
-
-\subsection{ScienceQA dataset}
-As mentioned, we will use the ScienceQA dataset. The ScienceQA dataset contains 21\,208 multimodal multiple-choice questions collected from primary and high school curricula. The questions are separated into 3 subjects: natural science, language science, and social science. Roughly 49\,\% of the questions have an image context, 48\,\% have a text context, and 31\,\% have both. An interesting aspect of the ScienceQA dataset is that most question contain lectures (84\,\%) and detailed explanations (91\,\%) that help answer the question. The dataset has already been split into train, test, and validation sets on HuggingFace. The train set contains 12\,726 observations, whereas the test and validation sets each contain 4\,241 observations. Figure \ref{fig:example_q} shows a typical question from the dataset.
 
 \begin{figure}
   \centering
@@ -115,7 +112,20 @@ As mentioned, we will use the ScienceQA dataset. The ScienceQA dataset contains 
   \label{fig:example_q}
 \end{figure}
 
+\subsection{ScienceQA dataset}
+As mentioned, we will use the ScienceQA dataset. The ScienceQA dataset contains 21\,208 multimodal multiple-choice questions collected from primary and high school curricula. The questions are separated into 3 subjects: natural science, language science, and social science. Roughly 49\,\% of the questions have an image context, 48\,\% have a text context, and 31\,\% have both. An interesting aspect of the ScienceQA dataset is that most question contain lectures (84\,\%) and detailed explanations (91\,\%) that help answer the question. The dataset has already been split into train, test, and validation sets on HuggingFace. The train set contains 12,726 observations, whereas the test and validation sets each contain 4,241 observations. Figure \ref{fig:example_q} shows a typical question from the dataset. We want the model to answer the question by returning the index of the list of choices corresponding to the correct answer. For example, in the question asked in figure \ref{fig:example_q}, the model should return "0".
+
 \subsection{Training details}
+
+We initially tried to have the pre-trained models accomplish the task without fine-tuning in order to have a benchmark. However, this proved futile as without fine-tuning the models were unable to answer the questions in the desired format. In fact, they would often hallucinate and return answers unrelated to the question.
+
+For PEFT methods, we trained within the HuggingFace environnement. Specifically, the PEFT package allows us to fine-tune HuggingFace models with LoRA and DoRA. We opted to use HuggingFace as it is very well documented and we can do everything we need, from data importation to computing test accuracy, with the same API. In order to have comparable training times, all fine-tuning was done on the same GPU. HuggingFace also allowed us to easily quantize the models.
+
+The ScienceQA dataset required very little pre-processing. All that was required was to transform the answers from integers into strings since the models return a string.
+
+We tried to vary the QLoRA hyperparameters to gauge their affect on performance. We tested Idefics2 with $r=4$ and $r=8$. We also applied QLoRA to only the last 50 linear layers of Idefics2. Since QDoRA has a greater memory requirement, we had to use a rank of 6 to be able to train on GPU. We did not explore the impact of varying hyperparameters with LLaVA because this model took much longer to train. We believe this is due to LLaVA taking much longer to perform the forward pass than Idefics2.
+
+We only trained the models for 2 epochs as this was sufficient to obtain decent results and the training times were costly. We used the largest batch size we could during training but this was often a small value such as 2. To compensate, we added gradient accumulation steps to increase the effective batch size. Gradient accumulation delays the updating of model parameters by accumulating gradients over a certain number of batches. For example, with a batch size of 2 and 8 gradient accumulation steps, the effective batch size is 16. We use some weight decay to reduce overfitting. This is important since we have a relatively small dataset for deep learning. Finally we utilize a warm-up period at the beginning of training to avoid having giving increased importance to the initial observations. We used a warm-up period of roughly 5\,\% of the total training steps. Without a warm-up period, the model can skew badly towards the initial observations. Thus, it would require more training to converge as it "un-trains" early mistakes.
 
 \subsection{Results}
 
@@ -127,40 +137,6 @@ Not suprising Idefics2 beat LLaVA-1.5 because it accepts greater image resolutio
 
 \section{Conclusion}
 \label{sec:conclusion}
-
-
-
-% Below is an example of how to insert images. Delete the ``\vspace'' line,
-% uncomment the preceding line ``\centerline...'' and replace ``imageX.ps''
-% with a suitable PostScript file name.
-% -------------------------------------------------------------------------
-\begin{figure}[htb]
-
-\begin{minipage}[b]{1.0\linewidth}
-  \centering
-  % \centerline{\includegraphics[width=8.5cm]{image1}}
-%  \vspace{2.0cm}
-  \centerline{(a) Result 1}\medskip
-\end{minipage}
-%
-\begin{minipage}[b]{.48\linewidth}
-  \centering
-  % \centerline{\includegraphics[width=4.0cm]{image3}}
-%  \vspace{1.5cm}
-  \centerline{(b) Results 3}\medskip
-\end{minipage}
-\hfill
-\begin{minipage}[b]{0.48\linewidth}
-  \centering
-  % \centerline{\includegraphics[width=4.0cm]{image4}}
-%  \vspace{1.5cm}
-  \centerline{(c) Result 4}\medskip
-\end{minipage}
-%
-\caption{Example of placing a figure with experimental results.}
-\label{fig:res}
-%
-\end{figure}
 
 
 % To start a new column (but not a new page) and help balance the last-page
@@ -179,5 +155,9 @@ Not suprising Idefics2 beat LLaVA-1.5 because it accepts greater image resolutio
 % -------------------------------------------------------------------------
 \bibliographystyle{IEEEbib}
 \bibliography{refs}
+
+\section{Github}
+
+The code can be accessed at :
 
 \end{document}
