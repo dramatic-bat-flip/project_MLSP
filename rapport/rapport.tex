@@ -32,13 +32,9 @@
 \maketitle
 %
 \begin{abstract}
-The abstract should appear at the top of the left-hand column of text, about
-0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
-length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
-beginning of the main text.  The abstract should contain about 100 to 150
-words, and should be identical to the abstract text submitted electronically
-along with the paper cover sheet.  All manuscripts must be in English, printed
-in black ink.
+Fine-tuning large language models (LLM) is often computationally prohibitive for consumer-grade hardware. This work investigates parameter-efficient fine-tuning (PEFT) techniques, such as QLoRA and QDoRA along with Promp-tuning, for multimodal question answering using the ScienceQA dataset. We evaluate these methods on two models, Idefics2 and LLaVA-1.5, demonstrating that QDoRA achieves superior performance, but requires more memory and time. Idefics2 consistently outperforms LLaVA-1.5 across configurations,
+affirming its suitability for this multimodal question answering.
+This work shows the potential of PEFT techniques in enabling advanced model fine-tuning on limited hardware while still maintaining high performance.
 \end{abstract}
 %
 \begin{keywords}
@@ -157,6 +153,12 @@ that the temporal costs are not worth the performance.
 \section{Conclusion}
 \label{sec:conclusion}
 
+By employing parameter-efficient fine-tuning techniques like QLoRA and QDoRA, the feasibility of achieving high performance without the computational burden of full fine-tuning was validated. The experiments indicate that QDoRA outperforms QLoRA, even with less trainable parameters, albeit with increased memory and time requirements. Additionally, the Idefics2 model consistently outperformed LLaVA-1.5 across different configurations, reinforcing its suitability for multimodal question-answering tasks.
+
+Prompt tuning was explored as another alternative to full fine-tuning, but its longer training times and relatively lower accuracy highlighted its limitations for this dataset. Concerning retrieval-augmented generation (RAG), it seems to be unsuitable due to inference latency and preparation overhead.
+
+Future work could involve optimizing hyperparameters more comprehensively, evaluating newer PEFT techniques, or testing current methods more systematically accross different rank values and
+choices of trainable layers.
 
 % To start a new column (but not a new page) and help balance the last-page
 % column length use \vfill\pagebreak.
