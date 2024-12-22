@@ -90,7 +90,7 @@ We will fine-tune both models with PEFT methods on a train set of the ScienceQA 
     Idefics2 QLoRA (r=8) & 23,326,720 & 6h 18min & 89.14\\ 
     Idefics2 QLoRA (r=4) & 11,663,360 & 4h 52min & 88.20\\ 
     Idefics2 QLoRA last 50 layers (r=8) & 4,734,976 & 1h & 77.00\\
-    Idefics2 QDoRA (r=6) & 19,033,856 & 10h 13min & 89.54\\
+    Idefics2 QDoRA (r=6) & 19,033,856 & 10h 13min & \textbf{89.54}\\
     LLaVA QLoRA (r=6) & 15,876,096 & 10h 20min & 83.28\\
     LLaVA QDoRA (r=5) & 14,663,680 & 14h 30min & 84.13\\
     Prompt-tuning & - & 4 days & 79.44\\
@@ -133,7 +133,25 @@ We only trained the models for 2 epochs as this was sufficient to obtain decent 
 Table \ref{tab:model_performance} presents the results of our various models and fine-tuning techniques.
 
 
-Not suprising Idefics2 beat LLaVA-1.5 because it accepts greater image resolution, has beaten LLaVA-1.5 in benchmarks, and is more recent. 
+Not suprisingly Idefics2 beats LLaVA-1.5 because it accepts greater image resolution and has beaten LLaVA-1.5 in other benchmarks.\cite{idefics2}
+
+Even though, LLaVA QDoRA has less trainable parameters than LLaVA QLoRA (because they don't have
+the same rank), it still managed to outperform the latter. This matches the claim that DoRA
+is supposed to offer better performance than LoRA, although it requires more training time.
+
+The same can be said about the Idefics2 results. The best performance of all the models is the one
+by Idefics2 trained with QDoRA (r=6), even though it's not the model with the most trainable parameters. But again,
+this comes with additional training time requirements.
+
+Overall, the results are aligned with common sense reasoning. For each model, the more trainable parameters you have,
+the better performance you get. The only exception is when you compare QLoRA and QDoRA. By separating the weights into
+their magnitude and orientation components, as is the case in QDoRA, it seems the models are able
+to augment their learning capacities compared to classic QLoRA fine-tuning. Although, QDoRA does come with
+greater memory and time requirements.
+
+Prompt-tuning offers an interesting alternative approach to other more conventional fine-tuning methods tested, but it seems
+that the temporal costs are not worth the performance.
+
 
 
 \section{Conclusion}
