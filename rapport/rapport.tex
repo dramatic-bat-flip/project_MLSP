@@ -18,7 +18,7 @@
 %
 % Single address.
 % ---------------
-\name{\qquad Philippe Gélinas \qquad Antoine Reid}
+\name{Sara Boukili \qquad Philippe Gélinas \qquad Antoine Reid}
 %
 % For example:
 % ------------
@@ -32,22 +32,29 @@
 \maketitle
 %
 \begin{abstract}
-Fine-tuning large language models (LLM) is often computationally prohibitive for consumer-grade hardware. This work investigates parameter-efficient fine-tuning (PEFT) techniques, such as QLoRA and QDoRA along with Promp-tuning, for multimodal question answering using the ScienceQA dataset. We evaluate these methods on two models, Idefics2 and LLaVA-1.5, demonstrating that QDoRA achieves superior performance, but requires more memory and time. Idefics2 consistently outperforms LLaVA-1.5 across configurations,
-affirming its suitability for this multimodal question answering.
-This work shows the potential of PEFT techniques in enabling advanced model fine-tuning on limited hardware while still maintaining high performance.
+The abstract should appear at the top of the left-hand column of text, about
+0.5 inch (12 mm) below the title area and no more than 3.125 inches (80 mm) in
+length.  Leave a 0.5 inch (12 mm) space between the end of the abstract and the
+beginning of the main text.  The abstract should contain about 100 to 150
+words, and should be identical to the abstract text submitted electronically
+along with the paper cover sheet.  All manuscripts must be in English, printed
+in black ink.
 \end{abstract}
 %
+\begin{keywords}
+One, two, three, four, five
+\end{keywords}
 %
 \section{Introduction}
 \label{sec:intro}
-LLM fine-tuning is a very active research topic and new methods are constantly being proposed. However, fine-tuning LLMs is computationaly expensive and most current techniques are prohibitively expensive for consumer hardware. We aim to fine-tune a multimodal LLM (MLLM) for a multiple-choice question answering task with consumer-grade hardware. Therefore, we limit ourselves to GPUs with no more than 15GB of VRAM and LLMs with no more than 8b parameters. We use the ScienceQA dataset as a benchmark to evaluate different fine-tuning techniques and models. We focus mainly on parameter-efficient fine-tuning as they allow training on consumer hardware. We also explored prompt-tuning which can be an alternative to fine-tuning. We briefly explored using RAG instead of fine-tuning but found this method to be unsuitable for our task.
+LLM fine-tuning is a very active research topic and new methods are constantly being proposed. However, fine-tuning LLMs is computationaly expensive and most current techniques are prohibitively expensive for consumer hardware. We aim to fine-tune a multimodal LLM (MLLM) for a multiple-choice question answering task with consumer-grade hardware. Therefore, we limit ourselves to GPUs with no more than 15GB of VRAM and LLMs with no more than 8b parameters. We use the ScienceQA dataset as a benchmark to evaluate different fine-tuning techniques and models. We focus mainly on parameter-efficient fine-tuning as they allow training on consumer hardware. We also explored prompt-tuning which can be an alternative to fine-tuning. We briefly explored using RAG instead of fine-tuning but found this method to be unsuitable for our task. We further investigated prompt-tuning as another fine-tuning method, which achieves task-specific adaptation by merely using model prompts without modifying model weights. This approach aligns with our hardware resources while maintaining strong task-specific performance.
 
 \section{Literature review}
 \label{sec:litreview}
 
-LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a separate set of weights which are then added to the original weights. In regular fine-tuning an entire weight update matrix ($\Delta W$) is combined with the pretrained weights. LoRA separates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. Compared to other adapter based fine-tuning techniques, LoRA does not introduce increased inference latency during inference. The downside of LoRA is that it introduces a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner dimension of the low-rank matrices.\par
+LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a separate set of weights which are then added to the original weights. In regular fine-tuning an entire weight update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA separates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. Compared to other adapter based fine-tuning techniques, LoRA does not introduce increased inference latency during inference. The downside of LoRA is that it introduces a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner dimension of the low-rank matrices.\par
 
-QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. To achieve this, the authors used 3 concepts : a new data type, 4-bit NormalFloat, which is theoretically optimal for normally distributed data, double quantization of quantization constants to increase the memory efficiency, and paged optimizers to handle memory spikes. \cite{qlora} observed performance levels similar to those of LoRA. Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understanding. DoRA decomposes the weights of a pretrained model into magnitude and direction components. DoRA can be applied in the same way as LoRA, and allows its variants like QDoRA.\par
+QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. To achieve this, the authors used 3 concepts : a new data type, 4-bit NormalFloat, which is theoretically optimal for normally distributed data, double quantization of quantization constants to increase the memory efficiency, and paged optimizers to handle memory spikes. \cite{qlora} observed performance levels similar to those of LoRA. Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understanding. DoRA decomposes the weights of a pre-trained model into magnitude and direction components. DoRA can be applied in the same way as LoRA, and allows its variants like QDoRA.\par
 
 ProMoT (Prompt Tuning with Model Tuning) \cite{valizadehaslani2022twostagefinetuningnovelstrategy} addresses the challenge of language models becoming overly specialized during fine-tuning, which can reduce their general capabilities. It uses a two-stage approach that offloads format learning to additional parameters through prompt tuning, allowing for comparable performance on the fine-tuned task while preserving or even enhancing general in-context learning abilities. This flexibility in managing various output formats and task types is particularly beneficial for the diverse question types in the ScienceQA dataset.\par
 
@@ -70,9 +77,34 @@ Despite the important reduction in trainable parameters LoRA offers, it can stil
 
 LoRA was found to have much a much different learning behavior than full fine-tuning. Furthermore, LoRA performs worse than full fine-tuning in certain situations. DoRA corrects these shortcomings by decomposing the pretrained weights into their magnitude and direction. LoRA is then applied to the directional component, while the magnitude component is trained as is. DoRA has a greater memory overhead than LoRA since there are more trainable parameters. The second PEFT method we utilize is a quantized version of DoRA.\par
 
-We will fine-tune both models with PEFT methods on a train set of the ScienceQA dataset and then evaluate the performance of the model on the test set. Given that there are a varying number of choices for each question (between 2 and 5), we use accuracy as a performance metric.
+We will fine-tune both models with PEFT methods on a train set of the ScienceQA dataset and then evaluate the performance of the model on the test set. Given that there are a varying number of choices (between 2 and 5), we use accuracy as a performance metric.
 
 \subsection{Prompt tuning}
+
+We adopted a prompt-tuning approach inspired by ProMot, using structured prompts to guide the model in answering multiple-choice ScienceQA tasks. Our prompts included contextual hints and lectures if available, with questions and choices formatted for clarity. The tokenization was performed with DeBERTa-base tokenizer, and a transformer-based encoder was fine-tuned to align with this structured input. 
+
+\subsubsection{Model: DeBERTa}
+
+As said before, we used DeBERTa (Decoding-enhanced BERT with Disentangled Attention) model as the backbone for our prompt-tuning experiments. This model improves upon its predecessors, BERT and RoBERTa, by introducing disentangled attention mechanisms and an enhanced mask decoder. This architecture allows for better contextual understanding and improved performance across a range of Natural Language Understanding tasks, particularly on datasets with a variety of input formats the one we're working with ScienceQA. \\
+We chose DeBERTa due to its state-of-the-art performance on multiple NLU benchmarks and its ability to efficiently handle diverse linguistic patterns. With over 80GB of training data, the model is well-suited for our objective of answering multimodal, multiple-choice science questions.
+
+\subsubsection{Prompt Structure:}
+
+One of the key innovations in our approach was the design of structured prompts used especially for the ScienceQA dataset. Each prompt guides the model in reasoning through the questions and available contextual information, such as hints or lectures. \\
+The structure of the prompt was carefully crafted to include:
+\begin{itemize}
+    \item Role Assignment: Defining the model's role as a specialized science tutor.
+    \item Contextual Information: Incorporating lecture content and hints, if available.
+    \item Question Presentation: Clearly stating the question and listing the multiple-choice options.
+    \item Task Instruction: Directing the model to provide the most accurate answer based on logical reasoning and scientific principles.
+\end{itemize}
+
+\begin{figure}
+  \centerline{\includegraphics[scale=0.2]{rapport/images/prompt.png}}
+  \caption{Example of an unstructured and a structured prompt from the ScienceQA dataset}
+  \label{fig:example_prompt}
+\end{figure}
+
 
 \begin{table*}[t]
   \centering
@@ -83,7 +115,7 @@ We will fine-tune both models with PEFT methods on a train set of the ScienceQA 
     Idefics2 QLoRA (r=8) & 23,326,720 & 6h 18min & 89.14\\ 
     Idefics2 QLoRA (r=4) & 11,663,360 & 4h 52min & 88.20\\ 
     Idefics2 QLoRA last 50 layers (r=8) & 4,734,976 & 1h & 77.00\\
-    Idefics2 QDoRA (r=6) & 19,033,856 & 10h 13min & \textbf{89.54}\\
+    Idefics2 QDoRA (r=6) & 19,033,856 & 10h 13min & 89.54\\
     LLaVA QLoRA (r=6) & 15,876,096 & 10h 20min & 83.28\\
     LLaVA QDoRA (r=5) & 14,663,680 & 14h 30min & 84.13\\
     Prompt-tuning & - & 4 days & 79.44\\
