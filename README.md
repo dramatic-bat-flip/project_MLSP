@@ -3,3 +3,7 @@ Our results can be observed through the outputs of the attached notebooks. Repro
 The Idefics2 folder contains all the notebooks associated with the Idefics2 model. `Idefics2_eval.ipynb` is the notebook that contains the code to compute the accuracy of a fine-tuned Iedfics2 model on the test dataset. The other notebooks in the folder all fine-tune Idefics2 in different ways.
 
 The LLaVA-1.5 folder contains all the notebooks associated with the LLaVA-1.5 model.  `llava_eval.ipynb` is the notebook that contains the code to compute the accuracy of a fine-tuned LLaVA-1.5 model on the test dataset.
+
+The Prompt-tuning folder contains the notebook associated with prompt-tuning using the DeBERTa-base model on 50 epoch
+
+The Llama2 + CLIP + QLoRA fine-tuning folder contains all the notebooks associated with the Llama2, CLIP model. 'llama_CLIP-QLoRA.ipynb' is the notebook that contains the code of this part.
