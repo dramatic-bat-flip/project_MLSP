@@ -47,7 +47,7 @@ One, two, three, four, five
 %
 \section{Introduction}
 \label{sec:intro}
-LLM fine-tuning is a very active research topic and new methods are constantly being proposed. However, fine-tuning LLMs is computationaly expensive and most current techniques are prohibitively expensive for consumer hardware. We aim to fine-tune a multimodal LLM (MLLM) for a multiple-choice question answering task with consumer-grade hardware. Therefore, we limit ourselves to GPUs with no more than 15GB of VRAM and LLMs with no more than 8b parameters. We use the ScienceQA dataset as a benchmark to evaluate different fine-tuning techniques and models. We focus mainly on parameter-efficient fine-tuning as they allow training on consumer hardware. We also explored prompt-tuning which can be an alternative to fine-tuning. We briefly explored using RAG instead of fine-tuning but found this method to be unsuitable for our task. We further investigated prompt-tuning as another fine-tuning method, which achieves task-specific adaptation by merely using model prompts without modifying model weights. This approach aligns with our hardware resources while maintaining strong task-specific performance.
+LLM fine-tuning is a very active research topic and new methods are constantly being proposed. However, fine-tuning LLMs is computationaly expensive and most current techniques are prohibitively expensive for consumer hardware. We aim to fine-tune a multimodal LLM (MLLM) for a multiple-choice question answering task with consumer-grade hardware. Therefore, we limit ourselves to GPUs with no more than 15GB of VRAM and LLMs with no more than 8b parameters. We use the ScienceQA dataset as a benchmark to evaluate different fine-tuning techniques and models. We focus mainly on parameter-efficient fine-tuning as they allow training on consumer hardware. We also explored prompt-tuning which can be an alternative to fine-tuning. We briefly explored using RAG instead of fine-tuning but found this method to be unsuitable for our task. We further investigated prompt-tuning as another fine-tuning method, which achieves task-specific adaptation by merely using model prompts without modifying model weights. This approach aligns with our hardware resources while maintaining strong task-specific performance. In addition to the previouly explored fine-tuning methodes, we incorporated a new approach using Llama 2 for text processing, CLIP-based Image Fine-Tuning(CIFT) for image contexts, and QLoRA for parameter-efficient adaptation.
 
 \section{Literature review}
 \label{sec:litreview}
@@ -105,6 +105,16 @@ The structure of the prompt was carefully crafted to include:
   \label{fig:example_prompt}
 \end{figure}
 
+\subsection{Multimodal Fine-Tuning with Llama 2, CIFT, and QLoRA}
+
+\subsubsection{Llama for Text}
+
+We selected Llama 2 (7B Chat) for textual input processing due to its state-of-art performance in casual language modeling and reasoning tasks. This model allows efficient adaptation for domain-specific tasks while preserving generalization.
+
+\subsubsection{CLIP- Based Image Fine-tuning (CIFT)}
+
+Since we have a dataset that contains texts and images, we used CLIP (Contrastive Language-Image Pretraining) for the image inputs. CLIP enables the encoding of image features into a sementic space aligned with textual inputs, ensuring a smooth integration into the multimodal pipeline. In our case, the CLIP processor was used to normalize and resize the images into a standard input format.
+
 
 \begin{table*}[t]
   \centering
@@ -115,10 +125,11 @@ The structure of the prompt was carefully crafted to include:
     Idefics2 QLoRA (r=8) & 23,326,720 & 6h 18min & 89.14\\ 
     Idefics2 QLoRA (r=4) & 11,663,360 & 4h 52min & 88.20\\ 
     Idefics2 QLoRA last 50 layers (r=8) & 4,734,976 & 1h & 77.00\\
-    Idefics2 QDoRA (r=6) & 19,033,856 & 10h 13min & 89.54\\
+    Idefics2 QDoRA (r=6). & 19,033,856 & 10h 13min & 89.54\\
     LLaVA QLoRA (r=6) & 15,876,096 & 10h 20min & 83.28\\
     LLaVA QDoRA (r=5) & 14,663,680 & 14h 30min & 84.13\\
     Prompt-tuning & - & 4 days & 79.44\\
+    Llama 2 CLIP QLoRA (r=4) & 16,777,216 & on going training & _ \\
     \hline
   \end{tabular}
   \caption{Accuracy of models on test dataset}
@@ -152,6 +163,8 @@ The ScienceQA dataset required very little pre-processing. All that was required
 We tried to vary the QLoRA hyperparameters to gauge their affect on performance. We tested Idefics2 with $r=4$ and $r=8$. We also applied QLoRA to only the last 50 linear layers of Idefics2. Since QDoRA has a greater memory requirement, we had to use a rank of 6 to be able to train on GPU. We did not explore the impact of varying hyperparameters with LLaVA because this model took much longer to train. We believe this is due to LLaVA taking much longer to perform the forward pass than Idefics2.
 
 We only trained the models for 2 epochs as this was sufficient to obtain decent results and the training times were costly. We used the largest batch size we could during training but this was often a small value such as 2. To compensate, we added gradient accumulation steps to increase the effective batch size. Gradient accumulation delays the updating of model parameters by accumulating gradients over a certain number of batches. For example, with a batch size of 2 and 8 gradient accumulation steps, the effective batch size is 16. We use some weight decay to reduce overfitting. This is important since we have a relatively small dataset for deep learning. Finally we utilize a warm-up period at the beginning of training to avoid having giving increased importance to the initial observations. We used a warm-up period of roughly 5\,\% of the total training steps. Without a warm-up period, the model can skew badly towards the initial observations. Thus, it would require more training to converge as it "un-trains" early mistakes.
+
+Concerning the experiment using Llama 2, CLIP and QLoRA;  This approach used structured prompts to integrate textual and visual contexts, enabling the model to reason effectively over multimodal inputs. The ScienceQA dataset was preprocessed to ensure compatibility with both Llama 2 and CLIP architectures.  Fine-tuning is ongoing, leveraging QLoRA's 4-bit quantization to reduce memory usage and enable training on consumer-grade hardware. The results will be reported once the training and evaluation are complete.
 
 \subsection{Results}
 
