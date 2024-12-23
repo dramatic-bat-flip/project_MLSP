@@ -18,7 +18,7 @@
 %
 % Single address.
 % ---------------
-\name{Sara Boukili \qquad Philippe Gélinas \qquad Antoine Reid}
+\name{\qquad Philippe Gélinas \qquad Antoine Reid}
 %
 % For example:
 % ------------
@@ -45,9 +45,9 @@ LLM fine-tuning is a very active research topic and new methods are constantly b
 \section{Literature review}
 \label{sec:litreview}
 
-LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a separate set of weights which are then added to the original weights. In regular fine-tuning an entire weight update matrix ($\Delta W$) is combined with the pre-trained weights. LoRA separates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. Compared to other adapter based fine-tuning techniques, LoRA does not introduce increased inference latency during inference. The downside of LoRA is that it introduces a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner dimension of the low-rank matrices.\par
+LoRA (Low-Rank Adaptation) is a fine-tuning technique for LLMs introduced by \cite{lora}. It deviates from regular fine-tuning by freezing the original model weights and by updating a separate set of weights which are then added to the original weights. In regular fine-tuning an entire weight update matrix ($\Delta W$) is combined with the pretrained weights. LoRA separates $\Delta W$ into 2 low-rank matrices that approximate it. This method significantly reduces the number of trainable parameters. Along with the reduced computational load this brings, it can also help prevent overfitting. Compared to other adapter based fine-tuning techniques, LoRA does not introduce increased inference latency during inference. The downside of LoRA is that it introduces a new hyperparameter, $r$, which must be optimized. This hyperparameter represents the inner dimension of the low-rank matrices.\par
 
-QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. To achieve this, the authors used 3 concepts : a new data type, 4-bit NormalFloat, which is theoretically optimal for normally distributed data, double quantization of quantization constants to increase the memory efficiency, and paged optimizers to handle memory spikes. \cite{qlora} observed performance levels similar to those of LoRA. Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understanding. DoRA decomposes the weights of a pre-trained model into magnitude and direction components. DoRA can be applied in the same way as LoRA, and allows its variants like QDoRA.\par
+QLoRA \cite{qlora} is a modification of LoRA that introduces increased memory efficiency due to storing weight parameters with 4-bit precision. To achieve this, the authors used 3 concepts : a new data type, 4-bit NormalFloat, which is theoretically optimal for normally distributed data, double quantization of quantization constants to increase the memory efficiency, and paged optimizers to handle memory spikes. \cite{qlora} observed performance levels similar to those of LoRA. Another LoRa variant is DoRA \cite{dora}, which is supposed to outperform LoRa for fine-tuning LLMs for various tasks, including ours, which relates to image-text understanding. DoRA decomposes the weights of a pretrained model into magnitude and direction components. DoRA can be applied in the same way as LoRA, and allows its variants like QDoRA.\par
 
 ProMoT (Prompt Tuning with Model Tuning) \cite{valizadehaslani2022twostagefinetuningnovelstrategy} addresses the challenge of language models becoming overly specialized during fine-tuning, which can reduce their general capabilities. It uses a two-stage approach that offloads format learning to additional parameters through prompt tuning, allowing for comparable performance on the fine-tuned task while preserving or even enhancing general in-context learning abilities. This flexibility in managing various output formats and task types is particularly beneficial for the diverse question types in the ScienceQA dataset.\par
 
@@ -111,7 +111,7 @@ As mentioned, we will use the ScienceQA dataset. The ScienceQA dataset contains 
 
 \subsection{Training details}
 
-We initially tried to have the pre-trained models accomplish the task without fine-tuning in order to have a benchmark. However, this proved futile as without fine-tuning the models were unable to answer the questions in the desired format. In fact, they would often hallucinate and return answers unrelated to the question.
+We initially tried to have the pretrained models accomplish the task without fine-tuning in order to have a benchmark. However, this proved futile as without fine-tuning the models were unable to answer the questions in the desired format. In fact, they would often hallucinate and return answers unrelated to the question.
 
 For PEFT methods, we trained within the HuggingFace environnement. Specifically, the PEFT package allows us to fine-tune HuggingFace models with LoRA and DoRA. We opted to use HuggingFace as it is very well documented and we can do everything we need, from data importation to computing test accuracy, with the same API. In order to have comparable training times, all fine-tuning was done on the same GPU. HuggingFace also allowed us to easily quantize the models.
 
@@ -154,8 +154,7 @@ By employing parameter-efficient fine-tuning techniques like QLoRA and QDoRA, th
 
 Prompt tuning was explored as another alternative to full fine-tuning, but its longer training times and relatively lower accuracy highlighted its limitations for this dataset. Concerning retrieval-augmented generation (RAG), it seems to be unsuitable due to inference latency and preparation overhead.
 
-Future work could involve optimizing hyperparameters more comprehensively, evaluating newer PEFT techniques, or testing current methods more systematically accross different rank values and
-choices of trainable layers.
+Future work could involve optimizing hyperparameters more comprehensively, evaluating newer PEFT techniques, or testing current methods more systematically across different rank values and choices of trainable layers.
 
 % To start a new column (but not a new page) and help balance the last-page
 % column length use \vfill\pagebreak.
