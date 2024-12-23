@@ -37,9 +37,6 @@ affirming its suitability for this multimodal question answering.
 This work shows the potential of PEFT techniques in enabling advanced model fine-tuning on limited hardware while still maintaining high performance.
 \end{abstract}
 %
-\begin{keywords}
-One, two, three, four, five
-\end{keywords}
 %
 \section{Introduction}
 \label{sec:intro}
@@ -73,7 +70,7 @@ Despite the important reduction in trainable parameters LoRA offers, it can stil
 
 LoRA was found to have much a much different learning behavior than full fine-tuning. Furthermore, LoRA performs worse than full fine-tuning in certain situations. DoRA corrects these shortcomings by decomposing the pretrained weights into their magnitude and direction. LoRA is then applied to the directional component, while the magnitude component is trained as is. DoRA has a greater memory overhead than LoRA since there are more trainable parameters. The second PEFT method we utilize is a quantized version of DoRA.\par
 
-We will fine-tune both models with PEFT methods on a train set of the ScienceQA dataset and then evaluate the performance of the model on the test set. Given that there are a varying number of choices (between 2 and 5), we use accuracy as a performance metric.
+We will fine-tune both models with PEFT methods on a train set of the ScienceQA dataset and then evaluate the performance of the model on the test set. Given that there are a varying number of choices for each question (between 2 and 5), we use accuracy as a performance metric.
 
 \subsection{Prompt tuning}
 
